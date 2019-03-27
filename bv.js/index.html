@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+	<title>BV.js</title>
+	<meta name="description" content="">
+	<meta name="author" content="Saleh Dindar">
+	<link rel="shortcut icon" href="favicon.ico">
+	<link rel="stylesheet" href="//bootswatch.com/flatly/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  </head>
+  <body class="noselect">
+
+    <!-- this branding always stays there to provide a means to show/hide the ui panel -->
+    <div id="ui-brand">
+      <a href="#" id="bar-menu"><i class="fa fa-bars" aria-hidden="true"></i></a>
+      BezierView.js
+    </div>
+
+	<div id="ui-panel" style="visibility: inherit">
+      <div class="form-horizontal">
+		<div class="button">
+		  <button id="btn-reset">Reset Projection</button>
+		</div>
+		<div class="checkbox">
+          <label>
+			<input type="checkbox" id="check-flat-shading"/> Flat Shading
+          </label>
+		</div>
+		<div class="checkbox">
+          <label>
+			<input type="checkbox" id="check-flip-normals"/> Flip Normals
+          </label>
+		</div>
+		<div class="checkbox">
+          <label>
+			<input type="checkbox" id="check-highlight"/> Highlight Lines
+          </label>
+		</div>
+		<div class="checkbox">
+          <label>
+			<input type="checkbox" id="check-reflection"/> Highlight Reflection
+          </label>
+		</div>
+		<div class="button">
+      <button id="btn-reduce-density">Reduce</button>
+      <button id="btn-increase-density">Increase</button>
+      <button id="btn-reset-density">Reset</button>
+		</div>
+		<div class="checkbox">
+		  <label>
+		    <input type="checkbox" id="check-light-1"/> Light 1
+		  </label>
+		  <label>
+		    <input type="checkbox" id="check-light-2"/> Light 2
+		  </label>
+		  <label>
+		    <input type="checkbox" id="check-light-3"/> Light 3
+		  </label>
+		</div>
+		<div class="checkbox">
+		  <label>
+		    <input type="checkbox" id="check-curvature"/> Curvature
+		  </label>
+		</div>
+
+		<div class="form-group">
+		  <label for="select-curv-type" class="col-lg-6 control-label">Curvature Type</label>
+		  <div class="col-lg-6">
+		    <select id="select-curv-type" class="form-control">
+			  <option value="0">Gaussian</option>
+			  <option value="1">Mean</option>
+			  <option value="2">Max</option>
+			  <option value="3">Min</option>
+			</select>
+		  </div>
+		 </div>
+
+		<div class="checkbox">
+          <label>
+			<input type="checkbox" id="check-control-mesh" /> Show Control Mesh
+          </label>
+		</div>
+		<div class="checkbox">
+		  <label>
+		    <input type="checkbox" id="check-bounding-box" /> Show Bounding Box
+		  </label>
+		</div>
+		<div class="checkbox">
+          <label>
+			<input type="checkbox" id="check-patches" checked /> Show Patches
+          </label>
+		</div>
+		<div class="radiobutton">
+		  Mouse Mode<br>
+		  <input id="rotateModeTrue" type="radio" name="mouseMode" value="rotate" checked="">Rotate
+		  <input id="rotateModeFalse" type="radio" name="mouseMode" value="clip">Clip
+		</div>
+		<div class="form-group">
+          <label for="select-patch-detail" class="col-lg-6 control-label">Patch Detail</label>
+          <div class="col-lg-6">
+			<select id="select-patch-detail" class="form-control" >
+			  <option value="4">4 &times; 4</option>
+			  <option value="8">8 &times; 8</option>
+			  <option value="16">16 &times; 16</option>
+			  <option value="32">32 &times; 32</option>
+			  <option value="64">64 &times; 64</option>
+			</select>
+          </div>
+		</div>
+		<div class="form-group">
+          <label for="select-group" class="col-lg-6 control-label">Group</label>
+          <div class="col-lg-6">
+			<select id="select-group" class="form-control" >
+         <!--THIS IS WHERE GROUPS-->
+			</select>
+          </div>
+		</div>
+
+		<div class="form-group">
+          <label for="select-group-color" class="col-lg-6 control-label">Group Color</label>
+          <div class="col-lg-6">
+			<select id="select-group-color" class="form-control" >
+
+			</select>
+          </div>
+		</div>
+		<div>
+          <button class="btn btn-default" id="save-position">Save Position</button>
+		</div>
+		<div>
+		  <button class="btn btn-default" id="remove-position">Remove Position</button>
+		</div>
+		<div class="form-group">
+          <label for="select-load-position" class="col-lg-6 control-label">Load Position</label>
+          <div class="col-lg-6">
+			<select id="select-load-position" class="form-control" >
+			</select>
+          </div>
+		</div>
+		<div>
+          <!--<button class="btn btn-default" id="screenshot">Screenshot</button>-->
+		</div>
+
+		<div class="form-group">
+          <label for="select-model" class="col-lg-6 control-label">Load Model</label>
+		</div>
+		<div>
+		  <input id="upload-file" type="file" />
+		</div>
+		<div>
+		  <p><b> Controls </b><br>
+		  Left Mouse: Rotate or Clip <br>
+		  Right Mouse: Pan <br>
+		  Scroll Wheel: Zoom <br>
+		  Scroll Wheel + Alt: Scale <br></p>
+		  <p> BV files can also be loaded by dragging and dropping on this window </p>
+		  <p><b> About </b><br>
+		  This is an implementation of
+		  <a href="http://www.cise.ufl.edu/research/SurfLab/bview/" target="_blank"> SurfLab's BezierView</a> using WebGL.<br>
+		  <a href="https://bitbucket.org/surflab/bv.js/" target="_blank"><i class="fa fa-bitbucket"></i> Source code</a></p>
+		</div>
+
+	  </div>
+	</div>
+
+
+	<canvas id="drawing"></canvas>
+
+	<!--<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>-->
+	<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>-->
+	<!--script src="https://cdn.rawgit.com/eligrey/FileSaver.js/62d219a0fac54b94cd4f230e7bfc55aa3f8dcfa4/FileSaver.js"></script>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script-->
+	<script src="js/vector.js"></script>
+	<script src="js/bvfile.js"></script>
+	<script src="js/matrix.js"></script>
+	<script src="js/crv.js"></script>
+	<script src="js/draw.js"></script>
+    <script src="js/ui.js"></script>
+  </body>
+</html>

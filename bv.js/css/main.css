@@ -1,0 +1,81 @@
+div#ui-brand {
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 30px;
+  width: 100%;
+  font-size: 18pt;
+  padding: 6px;
+}
+
+a#bar-menu {
+  margin: 4px;
+}
+
+div#ui-panel {
+  opacity: 0.8;
+  z-index: 2;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  width: 250px;
+  background-color: #ecf0f1;
+  height: 100%;
+  padding: 10px;
+  padding-top: 50px;
+  overflow-y: auto;
+}
+
+a.checked i.check {
+  visibility: visible;
+}
+a i.check {
+  visibility: hidden;
+}
+div#ui-panel > * {
+  opacity: 1.0;
+}
+.navbar .fa {
+  font-size: 130%;
+}
+canvas#drawing {
+  position: absolute;
+  top: 0; left: 0;
+  background-color: white;
+  cursor: default;
+  width: 100%;
+  height: 100%;
+}
+canvas#drawing.hover {
+  background-color: #eeffff;
+}
+.navbar-header img {
+  display: inline-block;
+  float: left;
+  height: 40px;
+  margin:2.5px 5px;
+}
+
+body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+div#settings-panel {
+}
+
+.noselect {
+	user-select: none;
+	-ms-user-select: none;
+	-moz-user-select: non;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;
+}
