@@ -26,7 +26,7 @@ function readBVFile(text, groupInfo) {
     input = text.split(/\s+/);
     cur = 0;
 
-	
+
     function readCP(n, rational) {
 		var i, j, l, b;
 		l = rational ? 4 : 3;
@@ -59,12 +59,12 @@ function readBVFile(text, groupInfo) {
     /* Read as many patches as possible */
 	// TODO detect if patch part of existing group
     while(cur < input.length && input[cur] != "") {
-		
+
 		if(input[cur].toUpperCase() == "GROUP")
 		{
 			color = Number(input[++cur]);
 			name = input[++cur];
-			
+
 			if (groupNames.indexOf(name) <= -1) {
 				// group doesn't already exist, make new group
 				groupNames.push(name);
@@ -72,7 +72,7 @@ function readBVFile(text, groupInfo) {
 			}
 			++cur;
 		}
-		
+
 		kind = Number(input[cur]);
 		cur += 1;
 
@@ -82,7 +82,7 @@ function readBVFile(text, groupInfo) {
 			var numVertices, numFaces, extraFaces = 0;
 			numVertices = Number(input[cur]); cur += 1;
 			numFaces = Number(input[cur]); cur += 1;
-			
+
 			// load vertices
 			var v = [];
 			for(var i = 0; i < numVertices; i++) {
@@ -90,10 +90,10 @@ function readBVFile(text, groupInfo) {
 				var y = Number(input[cur+1]);
 				var z = Number(input[cur+2]);
 				v.push(new vec4(x,y,z,1));
-				
+
 				cur+=3;
 			}
-			
+
 			// load faces
 			var f = [];
 			for(var i = 0; i < numFaces; i++) {
@@ -103,7 +103,7 @@ function readBVFile(text, groupInfo) {
 					var b = Number(input[cur+1]);
 					var c = Number(input[cur+2]);
 					f.push(new vec4(a,b,c,0));
-					
+
 					cur += 3;
 				} else if (numVertFace == 4) {
 					// transform one quad face into two triangle faces
@@ -112,18 +112,18 @@ function readBVFile(text, groupInfo) {
 					var b = Number(input[cur+1]);
 					var c = Number(input[cur+2]);
 					f.push(new vec4(a,b,c,0));
-					
+
 					// triangle a, c, d
 					var d = Number(input[cur+3]);
 					f.push(new vec4(a,c,d,0));
-					
+
 					extraFaces++;
 					cur += 4;
 				} else {
 					throw new Error("What kind of face is that?");
 				}
 			}
-			
+
 			patches.push(new Patch(PatchType.Polyhedral, numVertices, (numFaces+extraFaces), v, f, name));
 			break;
 
@@ -228,7 +228,7 @@ function deCasteljauQuad(patch, u, v, position, normal, curvature, idx, L) {
        order to 3 (quadratic), when we do it for 4, the result is
        order 3
 	*/
-	
+
 	for(o = ov; o >= 4; o--) {
 		for(i = 0; i < ou ; i ++) {
 			deCasteljauLine(cp, v, i, st, o);
@@ -244,7 +244,7 @@ function deCasteljauQuad(patch, u, v, position, normal, curvature, idx, L) {
 		}
 	}
 	/* now we have a 3x3 patch with stride stV */
-	
+
 	for(i = 0; i < 3; i++) deCasteljauLine(cp, v, i, st, 3);
 	for(i = 0; i < 2; i++) deCasteljauLine(cp, u, i*st, 1, 3);
 
@@ -253,8 +253,8 @@ function deCasteljauQuad(patch, u, v, position, normal, curvature, idx, L) {
 	controlPointDiff(cp, 0,  1);
 	controlPointDiff(cp, st, 1);
 	deCasteljauLine(cp, v, 2, st, 2);
-	deCasteljauLine(cp, u, 2*st, 1, 2); 
-	
+	deCasteljauLine(cp, u, 2*st, 1, 2);
+
 	/* tanU and tanV are calculated at
        c02 and c20, normal should be calculated directly */
 
@@ -265,16 +265,16 @@ function deCasteljauQuad(patch, u, v, position, normal, curvature, idx, L) {
 	normal[idx*3+0] = tuy * tvz - tuz * tvy;
 	normal[idx*3+1] = tuz * tvx - tux * tvz;
 	normal[idx*3+2] = tux * tvy - tuy * tvx;
-	
+
 	/* do the last step of deCasteljau to calculate the point */
 	deCasteljauLine(cp, v, 0, st, 2);
 	deCasteljauLine(cp, v, 1, st, 2);
 	deCasteljauLine(cp, u, 0,  1, 2);
 
 	for(i = 0; i < 4; i++) {
-		position[idx*4+i] = cp[i];	
+		position[idx*4+i] = cp[i];
 	}
-	
+
 	patch.max.x = Math.max(patch.max.x, position[idx*4+0]);
 	patch.max.y = Math.max(patch.max.y, position[idx*4+1]);
 	patch.max.z = Math.max(patch.max.z, position[idx*4+2]);
@@ -307,19 +307,19 @@ function evaluate(patch, tessellation, baseVertex, baseIndex, output, vertexOffs
 	nor = output.normal;
 	curv = output.curvature;
 	ind = output.index;
-		
+
 	if(patch.kind === PatchType.Triangle) {
 		throw new Error("Not implemented");
 	} else if(patch.kind === PatchType.Quadrilateral) {
 
 		/* Evaluate vertices */
-		
+
 		// array that will contain all vertices of the patch
 		var bb = new Array( (L+1) * (L+1));
 		for (var i=0; i < bb.length; i++) {
 			bb[i] = new vec4();
 		}
-		
+
 		j = baseVertex;
 		for(vi = 0; vi <= L; vi++) {
 			for(ui = 0; ui <= L; ui++) {
@@ -329,7 +329,7 @@ function evaluate(patch, tessellation, baseVertex, baseIndex, output, vertexOffs
 			}
 		}
 		//console.log(bb);
-		
+
 		/* Evaluate curvature */
 		evaluateCurvature(bb, curv, patch.orderU, patch.orderV, baseVertex, L);
 
@@ -344,7 +344,7 @@ function evaluate(patch, tessellation, baseVertex, baseIndex, output, vertexOffs
 				ind[j + 3] = b + 1;
 				ind[j + 4] = b + (L+1);
 				ind[j + 5] = b + (L+1) +  1;
-				
+
 				j += 6;
 			}
 		}
@@ -355,13 +355,13 @@ function evaluate(patch, tessellation, baseVertex, baseIndex, output, vertexOffs
 		// face normal numbers in bv file point to index of vertex
 		var v = patch.controlPoints;
 		var f = patch.faces;
-		
+
 		for (i = 0; i < v.length; i++) {
 			pos[i*4+0 + baseVertex*4] = v[i].x;
 			pos[i*4+1 + baseVertex*4] = v[i].y;
 			pos[i*4+2 + baseVertex*4] = v[i].z;
 			pos[i*4+3 + baseVertex*4] = v[i].w;
-			
+
 			patch.max.x = Math.max(patch.max.x, pos[i*4+0 + baseVertex*4]);
 			patch.max.y = Math.max(patch.max.y, pos[i*4+1 + baseVertex*4]);
 			patch.max.z = Math.max(patch.max.z, pos[i*4+2 + baseVertex*4]);
@@ -371,26 +371,26 @@ function evaluate(patch, tessellation, baseVertex, baseIndex, output, vertexOffs
 			patch.min.z = Math.min(patch.min.z, pos[i*4+2 + baseVertex*4]);
 			patch.min.w = Math.min(patch.min.w, pos[i*4+3 + baseVertex*4]);
 		}
-		
+
 		var cb = new vec4(0,0,0,0);
 		var ab = new vec4(0,0,0,0);
 		for (i = 0; i < f.length; i++) {
 			var face = f[i];
-			
+
 			ind[i*3+0 + baseIndex] = face.x;
 			ind[i*3+1 + baseIndex] = face.y;
 			ind[i*3+2 + baseIndex] = face.z;
-			
+
 			var vA = v[face.x];
 			var vB = v[face.y];
 			var vC = v[face.z];
-			
+
 			cb.subVec(vC, vB);
 			ab.subVec(vA, vB);
 			cb.cross(ab);
-			
+
 			cb.normalize();
-			
+
 			// vertex normals from face normals
 			//TODO find a better way to get vertex normals from face normals, perhaps weighted
 			nor[face.x*3+0 + baseVertex*3] += cb.x;
@@ -402,9 +402,9 @@ function evaluate(patch, tessellation, baseVertex, baseIndex, output, vertexOffs
 			nor[face.x*3+2 + baseVertex*3] += cb.z;
 			nor[face.y*3+2 + baseVertex*3] += cb.z;
 			nor[face.z*3+2 + baseVertex*3] += cb.z;
-			
+
 		}
-		
+
 		// normalize vertex normals
 		for (i = 0; i < nor.length; i+= 3) {
 			var tempVec = new vec4(nor[i+0 + baseVertex*3],nor[i+1 + baseVertex*3],nor[i+2 + baseVertex*3],0);
@@ -424,30 +424,31 @@ function evaluateCurvature(bb, curv, degu, degv, idx, L) {
 	var h, vi, ui;
 	var tempCurv = new vec4();
 	j = idx;
+
 	for (vi = 0; vi < (L-1); vi++) {
 		for(ui = 0; ui < (L-1); ui++) {
 			//console.log("vi, ui, |- stencil: " + vi + " " + ui);
 			//stencil is |-
 			h = crv.crv4(bb[(vi*(L+1))+ui],bb[(vi*(L+1))+ui+1],bb[(vi*(L+1))+ui+2],
 				bb[((vi+1)*(L+1))+ui],bb[((vi+2)*(L+1))+ui],bb[((vi+1)*(L+1))+ui+1], degu, degv, tempCurv);
-				
+
 				//console.log("tempCurv: " + tempCurv.x + " " + tempCurv.y + " " + tempCurv.z + " " + tempCurv.w);
-				
+
 			curv[j*4+0] = tempCurv.x;
 			curv[j*4+1] = tempCurv.y;
 			curv[j*4+2] = tempCurv.z;
 			curv[j*4+3] = tempCurv.w;
 			j += 1;
 		}
-		
+
 		for (ui; ui < (L+1); ui++) {
 			//console.log("vi, ui, -| stencil: " + vi + " " + ui);
 			//last cols, -| note: stencil is rotated by 90 degrees
 			h = crv.crv4(bb[(vi*(L+1))+ui],bb[((vi+1)*(L+1))+ui],bb[((vi+2)*(L+1))+ui],bb[(vi*(L+1))+ui-1],
 				bb[(vi*(L+1))+ui-2],bb[((vi+1)*(L+1))+ui-1], degv, degu, tempCurv);
-				
+
 				//console.log("tempCurv: " + tempCurv.x + " " + tempCurv.y + " " + tempCurv.z + " " + tempCurv.w);
-				
+
 			curv[j*4+0] = tempCurv.x;
 			curv[j*4+1] = tempCurv.y;
 			curv[j*4+2] = tempCurv.z;
@@ -462,24 +463,24 @@ function evaluateCurvature(bb, curv, degu, degv, idx, L) {
 			//console.log("vi, ui, |_ stencil: " + vi + " " + ui);
 			h = crv.crv4(bb[(vi*(L+1))+ui],bb[((vi-1)*(L+1))+ui],bb[((vi-2)*(L+1))+ui],
 				bb[(vi*(L+1))+ui+1],bb[(vi*(L+1))+ui+2],bb[((vi-1)*(L+1))+ui+1], degv, degu, tempCurv);
-				
+
 				//console.log("tempCurv: " + tempCurv.x + " " + tempCurv.y + " " + tempCurv.z + " " + tempCurv.w);
-				
+
 			curv[j*4+0] = tempCurv.x;
 			curv[j*4+1] = tempCurv.y;
 			curv[j*4+2] = tempCurv.z;
 			curv[j*4+3] = tempCurv.w;
 			j += 1;
 		}
-		
+
 		for (ui; ui < (L+1); ui++) {
 			//last cols, stencil is _|
 			//console.log("vi, ui, _| stencil: " + vi + " " + ui);
 			h = crv.crv4(bb[((vi)*(L+1))+ui],bb[((vi)*(L+1))+ui-1],bb[((vi)*(L+1))+ui-2],bb[((vi-1)*(L+1))+ui],
 				bb[((vi-2)*(L+1))+ui],bb[((vi-1)*(L+1))+ui-1], degu, degv, tempCurv);
-				
+
 				//console.log("tempCurv: " + tempCurv.x + " " + tempCurv.y + " " + tempCurv.z + " " + tempCurv.w);
-				
+
 			curv[j*4+0] = tempCurv.x;
 			curv[j*4+1] = tempCurv.y;
 			curv[j*4+2] = tempCurv.z;

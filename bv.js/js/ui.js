@@ -74,7 +74,6 @@ function settingsUIRefresh() {
 	document.getElementById('check-control-mesh').checked = settings.showControlMesh;
 	document.getElementById('check-bounding-box').checked = settings.showBoundingBox;
 	document.getElementById('check-patches').checked = settings.showPatches;
-	document.getElementById('select-highlight-density').value = settings.highlightDensity;
 	document.getElementById('check-light-1').checked = settings.lightsOn[0] != 0.0;
 	document.getElementById('check-light-2').checked = settings.lightsOn[1] != 0.0;
 	document.getElementById('check-light-3').checked = settings.lightsOn[2] != 0.0;

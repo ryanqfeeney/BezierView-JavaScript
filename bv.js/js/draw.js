@@ -34,6 +34,7 @@ var curvType = {
 	Mean: 1,
 	Max: 2,
 	Min: 3,
+
 };
 
 var defaultSettings = {
@@ -487,89 +488,117 @@ function buildControlMesh(obj){
 	}
 }
 
-function reevaluateBezierObject(obj){
-	var patches, i, j, vertexCount, indexCount, obj, tessellation;
-	var baseVertex, baseIndex;
-	patches = obj.patches;
-	tessellation = obj.tessellationLevel;
-	/* count the number of vertices and indices of
-       all the patches when evaluated */
-	vertexCount = 0, indexCount = 0;
-	for(i = 0; i < patches.length; i++) {
-		o = evaluateCount(patches[i], tessellation);
-		vertexCount += o.vertexCount;
-		indexCount += o.indexCount;
-	}
+function reevaluateBezierObject(inObj){
+  var inMax = new vec4(-1001,-1001,-1001,-1001);
+  var inMin = new vec4(1001,1001,1001,1001);;
+  for(j = 0; j < inObj.groups.length; j++) {
+    var obj = inObj.groups[j];
+  	var patches, i, j, vertexCount, indexCount, obj, tessellation;
+  	var baseVertex, baseIndex;
+  	patches = obj.patches;
+  	tessellation = obj.tessellationLevel;
+  	/* count the number of vertices and indices of
+         all the patches when evaluated */
+  	vertexCount = 0, indexCount = 0;
+  	for(i = 0; i < patches.length; i++) {
+  		o = evaluateCount(patches[i], tessellation);
+  		vertexCount += o.vertexCount;
+  		indexCount += o.indexCount;
+  	}
 
 
-	obj.position = new Float32Array(4 * vertexCount);
-	obj.normal = new Float32Array(3 * vertexCount);
-	obj.curvature = new Float32Array(4 * vertexCount);
-	obj.index = new Uint32Array(indexCount);
+  	obj.position = new Float32Array(4 * vertexCount);
+  	obj.normal = new Float32Array(3 * vertexCount);
+  	obj.curvature = new Float32Array(4 * vertexCount);
+  	obj.index = new Uint32Array(indexCount);
 
-	// to calculate curvature
-	crv = new CRV();
-	crv.init();
+  	// to calculate curvature
+  	crv = new CRV();
+  	crv.init();
 
-	baseVertex = 0; baseIndex = 0;
-	for(i = 0; i < patches.length; i++) {
-		o = evaluateCount(patches[i], tessellation);
-		evaluate(patches[i], tessellation, baseVertex, baseIndex, obj, 0);
+  	baseVertex = 0; baseIndex = 0;
+  	for(i = 0; i < patches.length; i++) {
+  		o = evaluateCount(patches[i], tessellation);
+  		evaluate(patches[i], tessellation, baseVertex, baseIndex, obj, 0);
 
-		// save max and min position values of object
-		obj.max.x = Math.max(obj.max.x, patches[i].max.x);
-		obj.max.y = Math.max(obj.max.y, patches[i].max.y);
-		obj.max.z = Math.max(obj.max.z, patches[i].max.z);
-		obj.max.w = Math.max(obj.max.w, patches[i].max.w);
-		obj.min.x = Math.min(obj.min.x, patches[i].min.x);
-		obj.min.y = Math.min(obj.min.y, patches[i].min.y);
-		obj.min.z = Math.min(obj.min.z, patches[i].min.z);
-		obj.min.w = Math.min(obj.min.w, patches[i].min.w);
+  		// save max and min position values of object
+  		obj.max.x = Math.max(obj.max.x, patches[i].max.x);
+  		obj.max.y = Math.max(obj.max.y, patches[i].max.y);
+  		obj.max.z = Math.max(obj.max.z, patches[i].max.z);
+  		obj.max.w = Math.max(obj.max.w, patches[i].max.w);
+  		obj.min.x = Math.min(obj.min.x, patches[i].min.x);
+  		obj.min.y = Math.min(obj.min.y, patches[i].min.y);
+  		obj.min.z = Math.min(obj.min.z, patches[i].min.z);
+  		obj.min.w = Math.min(obj.min.w, patches[i].min.w);
 
-		baseVertex += o.vertexCount;
-		baseIndex += o.indexCount;
-	}
+  		baseVertex += o.vertexCount;
+  		baseIndex += o.indexCount;
+  	}
 
-	// set curvature range
-	// TODO put the following in a separate function?
-	var max = isNaN(crv.max_crv.x) ? 1000 : crv.max_crv.x;
-	var min = isNaN(crv.min_crv.x) ? -1000 : crv.min_crv.x;
-	obj.maxCrv.x = max;
-	obj.minCrv.x = min;
+  	// set curvature range
+  	// TODO put the following in a separate function?
+  	var max = isNaN(crv.max_crv.x) ? 1000 : crv.max_crv.x;
+  	var min = isNaN(crv.min_crv.x) ? -1000 : crv.min_crv.x;
+    if (inMax.x < max) {inMax.x = max; console.log(max);}
+    if (inMin.x > min) {inMin.x = min}
+  	obj.maxCrv.x = inMax.x;
+  	obj.minCrv.x = inMin.x;
 
-	max = isNaN(crv.max_crv.y) ? 1000 : crv.max_crv.y;
-	min = isNaN(crv.min_crv.y) ? -1000 : crv.min_crv.y;
-	obj.maxCrv.y = max;
-	obj.minCrv.y = min;
 
-	max = isNaN(crv.max_crv.z) ? 1000 : crv.max_crv.z;
-	min = isNaN(crv.min_crv.z) ? -1000 : crv.min_crv.z;
-	obj.maxCrv.z = max;
-	obj.minCrv.z = min;
+  	max = isNaN(crv.max_crv.y) ? 1000 : crv.max_crv.y;
+  	min = isNaN(crv.min_crv.y) ? -1000 : crv.min_crv.y;
+    if (inMax.y < max) {inMax.y = max}
+    if (inMin.y > min) {inMin.y = min}
+  	obj.maxCrv.y = inMax.y;
+  	obj.minCrv.y = inMin.y;
 
-	max = isNaN(crv.max_crv.w) ? 1000 : crv.max_crv.w;
-	min = isNaN(crv.min_crv.w) ? -1000 : crv.min_crv.w;
-	obj.maxCrv.w = max;
-	obj.minCrv.w = min;
+  	max = isNaN(crv.max_crv.z) ? 1000 : crv.max_crv.z;
+  	min = isNaN(crv.min_crv.z) ? -1000 : crv.min_crv.z;
+    if (inMax.z < max) {inMax.z = max}
+    if (inMin.z > min) {inMin.z = min}
+  	obj.maxCrv.z = inMax.z;
+  	obj.minCrv.z = inMin.z;
 
-	//console.log(obj.maxCrv);
-	//console.log(obj.minCrv);
+  	max = isNaN(crv.max_crv.w) ? 1000 : crv.max_crv.w;
+  	min = isNaN(crv.min_crv.w) ? -1000 : crv.min_crv.w;
+    if (inMax.w < max) {inMax.w = max}
+    if (inMin.w > min) {inMin.w = min}
+  	obj.maxCrv.w = inMax.w;
+  	obj.minCrv.w = inMin.w;
+
+
+
+  }
+  for(j = inObj.groups.length-1; j >= 0; j--) {
+    inObj.groups[j].maxCrv = inMax;
+    inObj.groups[j].minCrv = inMin;
+    uploadObject(inObj.groups[j]);
+    console.log("TESTss2");
+  }
+
+
+
+	console.log(obj.maxCrv);
+	console.log(obj.minCrv);
 }
+
+
 
 function setTessellationLevel(level) {
 	var menuitems, i, j , o;
 	menuitems = document.querySelectorAll('#patch-detail-menu a[data-value]');
 	for(i = 0; i < menuitems.length; i++)
 		menuitems[i].className = menuitems[i].getAttribute('data-value') == String(level) ? 'checked' : '';
+// edited by Ryan Feeney. passed whole object to reevaluateBezierObject() so the global min and max curve can be preserved
 
-	for(i = 0; i < renderState.objects.length; i++) {
-		o = renderState.objects[i];
-		for(j = 0; j < o.groups.length; j++) {
-			o.groups[j].tessellationLevel = level;
-			reevaluateBezierObject(o.groups[j]);
-			uploadObject(o.groups[j]);
-		}
-	}
+  for(i = 0; i < renderState.objects.length; i++) {
+    o = renderState.objects[i];
+    for(j = 0; j < o.groups.length; j++) {
+      o.groups[j].tessellationLevel = level;
+    }
+    reevaluateBezierObject(o);
+  }
+  ///////////////////////////////////
 }
 
 function resetProjection() {
@@ -702,8 +731,8 @@ function loadBezierObject(text, obj) {
 	}
 	for(i = 0; i < obj.groups.length; i++) {
 		buildControlMesh(obj.groups[i]);
-		reevaluateBezierObject(obj.groups[i]);
-		uploadObject(obj.groups[i]);
+	//	reevaluateBezierObject(obj.groups[i]);
+	//	uploadObject(obj.groups[i]);
 
 		//update "Group" drop-box on the page
 		var opt = i+1;
@@ -712,6 +741,8 @@ function loadBezierObject(text, obj) {
 		el.value = opt;
 		tmp.appendChild(el);
 	}
+  reevaluateBezierObject(obj);
+
 }
 
 function setup() {
@@ -811,7 +842,7 @@ function setup() {
 	InitColorDialogBox();
 
 	var fn;
-	fn = 'data/logo.bv';
+	fn = 'data/fertility_quad.bv';
 	loadAsyncResource(fn, function(text){
 		// TODO: remove create empty object
 		renderState.objects[0] = createEmptyObject();
@@ -1022,15 +1053,7 @@ function setup() {
 		var n = colorGroup(e.target.value);
 	});
 
-	document.getElementById('select-highlight-density').addEventListener('change', function(e){
-		settings.highlightDensity = e.target.value;
-	});
 
-	document.getElementById('select-model').addEventListener('change', function(e){
-		loadAsyncResource(e.target.value, function(text){
-			loadBezierObject(text, renderState.objects[0]);
-		});
-	});
 
 }
 
